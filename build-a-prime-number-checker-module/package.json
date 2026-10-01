@@ -1,0 +1,25 @@
+{
+  "name": "prime-number-checker",
+  "version": "1.0.0",
+  "description": "Just a prime number checker",
+  "keywords": [
+    "prime",
+    "number",
+    "checker"
+  ],
+  "homepage": "https://github.com/erichcl/back-end-development-and-apis/tree/main#readme",
+  "bugs": {
+    "url": "https://github.com/erichcl/back-end-development-and-apis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erichcl/back-end-development-and-apis.git#main"
+  },
+  "license": "ISC",
+  "author": "Erich",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
