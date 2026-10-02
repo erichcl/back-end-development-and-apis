@@ -1,0 +1,27 @@
+{
+  "name": "build-a-personal-profile-app",
+  "version": "1.0.0",
+  "description": "personal profile test",
+  "keywords": [
+    "personal",
+    "profile"
+  ],
+  "homepage": "https://github.com/erichcl/back-end-development-and-apis/tree/main#readme",
+  "bugs": {
+    "url": "https://github.com/erichcl/back-end-development-and-apis/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erichcl/back-end-development-and-apis.git#main"
+  },
+  "license": "ISC",
+  "author": "erich",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
