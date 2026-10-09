@@ -760,13 +760,61 @@ assert.match(
 The `POST /transfer` route should throw a `404` error if the sender account is not found.
 
 ```js
-const __senderNotFoundIdx = __file.search(
-  /sender[\s\S]{0,30}404|404[\s\S]{0,60}sender/,
+const __senderIf = __allIfStatements.find(
+  (statement) =>
+    statement.test?.type === "UnaryExpression" &&
+    statement.test.operator === "!" &&
+    statement.test.argument?.type === "Identifier" &&
+    statement.test.argument.name === "sender",
 );
+
+assert.exists(
+  __senderIf,
+  "The `POST /transfer` handler should check whether the sender exists",
+);
+
+const __senderStatements =
+  __senderIf.consequent?.type === "BlockStatement"
+    ? __senderIf.consequent.body
+    : [__senderIf.consequent];
+
+const __senderStatusIndex = __senderStatements.findIndex(
+  (statement) => {
+    const __expression = statement.expression;
+
+    return (
+      statement.type === "ExpressionStatement" &&
+      __expression?.type === "AssignmentExpression" &&
+      __expression.operator === "=" &&
+      __expression.left?.type === "MemberExpression" &&
+      !__expression.left.computed &&
+      __expression.left.object?.type === "Identifier" &&
+      __expression.left.object.name === "err" &&
+      __expression.left.property?.type === "Identifier" &&
+      __expression.left.property.name === "status" &&
+      __expression.right?.type === "NumericLiteral" &&
+      __expression.right.value === 404
+    );
+  },
+);
+
+assert.isAtLeast(
+  __senderStatusIndex,
+  0,
+  "The sender-not-found branch should set `err.status = 404`",
+);
+
+const __senderThrowIndex = __senderStatements.findIndex(
+  (statement) =>
+    statement.type === "ThrowStatement" &&
+    statement.argument?.type === "Identifier" &&
+    statement.argument.name === "err",
+);
+
 assert.isAbove(
-  __senderNotFoundIdx,
-  -1,
-  "The `POST /transfer` handler should set `err.status = 404` when the sender is not found",
+  __senderThrowIndex,
+  __senderStatusIndex,
+  "The sender-not-found branch should throw the error after setting `err.status = 404`",
 );
 ```
 
@@ -774,6 +822,35 @@ assert.isAbove(
 
 ```js
 const __file = await __helpers.getFile(project.dashedName, "server.js");
+const __i = new __helpers.Inspector(__file);
+const __route = __i.getCalls("app.post").find(
+  (call) => __i.argText(call.arguments?.at(0)) === "/transfer",
+);
+const __handler = __route
+  ? __i.getCallbacks(__route).at(-1)
+  : null;
+const __handlerBody =
+  __handler?.body?.type === "BlockStatement" ? __handler.body : null;
+
+const __handlerIfStatements = __handlerBody
+  ? new __helpers.Tower(__handlerBody).getIfStatements()
+  : [];
+
+const __tryStatement = __handlerBody?.body.find(
+  (statement) => statement.type === "TryStatement",
+);
+const __tryIfStatements = __tryStatement
+  ? new __helpers.Tower(__tryStatement.block).getIfStatements()
+  : [];
+const __allIfStatements = [
+  ...__handlerIfStatements,
+  ...__tryIfStatements,
+];
+
+assert.exists(
+  __handlerBody,
+  "The `POST /transfer` route should have a handler",
+);
 ```
 
 ## 14
@@ -807,13 +884,61 @@ assert.match(
 The `POST /transfer` route should throw a `404` error if the recipient account is not found.
 
 ```js
-const __recipientNotFoundIdx = __file.search(
-  /recipient[\s\S]{0,30}404|404[\s\S]{0,60}recipient/,
+const __recipientIf = __allIfStatements.find(
+  (statement) =>
+    statement.test?.type === "UnaryExpression" &&
+    statement.test.operator === "!" &&
+    statement.test.argument?.type === "Identifier" &&
+    statement.test.argument.name === "recipient",
 );
+
+assert.exists(
+  __recipientIf,
+  "The `POST /transfer` handler should check whether the recipient exists",
+);
+
+const __recipientStatements =
+  __recipientIf.consequent?.type === "BlockStatement"
+    ? __recipientIf.consequent.body
+    : [__recipientIf.consequent];
+
+const __recipientStatusIndex = __recipientStatements.findIndex(
+  (statement) => {
+    const __expression = statement.expression;
+
+    return (
+      statement.type === "ExpressionStatement" &&
+      __expression?.type === "AssignmentExpression" &&
+      __expression.operator === "=" &&
+      __expression.left?.type === "MemberExpression" &&
+      !__expression.left.computed &&
+      __expression.left.object?.type === "Identifier" &&
+      __expression.left.object.name === "err" &&
+      __expression.left.property?.type === "Identifier" &&
+      __expression.left.property.name === "status" &&
+      __expression.right?.type === "NumericLiteral" &&
+      __expression.right.value === 404
+    );
+  },
+);
+
+assert.isAtLeast(
+  __recipientStatusIndex,
+  0,
+  "The recipient-not-found branch should set `err.status = 404`",
+);
+
+const __recipientThrowIndex = __recipientStatements.findIndex(
+  (statement) =>
+    statement.type === "ThrowStatement" &&
+    statement.argument?.type === "Identifier" &&
+    statement.argument.name === "err",
+);
+
 assert.isAbove(
-  __recipientNotFoundIdx,
-  -1,
-  "The `POST /transfer` handler should set `err.status = 404` when the recipient is not found",
+  __recipientThrowIndex,
+  __recipientStatusIndex,
+  "The recipient-not-found branch should throw the error after setting `err.status = 404`",
 );
 ```
 
@@ -821,6 +946,36 @@ assert.isAbove(
 
 ```js
 const __file = await __helpers.getFile(project.dashedName, "server.js");
+const __i = new __helpers.Inspector(__file);
+const __route = __i.getCalls("app.post").find(
+  (call) => __i.argText(call.arguments?.at(0)) === "/transfer",
+);
+
+const __handler = __route
+  ? __i.getCallbacks(__route).at(-1)
+  : null;
+
+const __handlerBody =
+  __handler?.body?.type === "BlockStatement" ? __handler.body : null;
+const __handlerIfStatements = __handlerBody
+  ? new __helpers.Tower(__handlerBody).getIfStatements()
+  : [];
+
+const __tryStatement = __handlerBody?.body.find(
+  (statement) => statement.type === "TryStatement",
+);
+const __tryIfStatements = __tryStatement
+  ? new __helpers.Tower(__tryStatement.block).getIfStatements()
+  : [];
+const __allIfStatements = [
+  ...__handlerIfStatements,
+  ...__tryIfStatements,
+];
+
+assert.exists(
+  __handlerBody,
+  "The `POST /transfer` route should have a handler",
+);
 ```
 
 ## 15
@@ -1196,7 +1351,7 @@ Express has a built-in <dfn title="detailed output that shows internal operation
 DEBUG=express:* node server.js
 ```
 
-Watch the output as Express starts up - you will see each route and middleware being registered in order. Send a request with `curl` and observe how Express matches it step by step. When you are done exploring, stop the server with `Ctrl+C`.
+Watch the output as Express starts up - you will see each route and middleware being registered in order. Send a request with `curl` and observe how Express matches it step by step. When you are done exploring, stop the server with <kbd>Ctrl</kbd> + <kbd>C</kbd>.
 
 ### --tests--
 
@@ -1400,7 +1555,7 @@ const __file = await __helpers.getFile(project.dashedName, "server.js");
 
 ### --description--
 
-Add the same graceful shutdown logic for `SIGINT` - the signal sent when you press `Ctrl+C` in the terminal. Use the same pattern as `SIGTERM`:
+Add the same graceful shutdown logic for `SIGINT` - the signal sent when you press <kbd>Ctrl</kbd> + <kbd>C</kbd> in the terminal. Use the same pattern as `SIGTERM`:
 
 ```js
 process.on("SIGINT", () => {
